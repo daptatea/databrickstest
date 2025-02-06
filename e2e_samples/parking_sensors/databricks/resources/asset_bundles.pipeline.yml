@@ -1,0 +1,14 @@
+# The main pipeline for asset_bundles
+resources:
+  pipelines:
+    asset_bundles_pipeline:
+      name: asset_bundles_pipeline
+      ## Specify the 'catalog' field to configure this pipeline to make use of Unity Catalog:
+      # catalog: catalog_name
+      target: asset_bundles_${bundle.environment}
+      libraries:
+        - notebook:
+            path: ../src/dlt_pipeline.ipynb
+
+      configuration:
+        bundle.sourcePath: ${workspace.file_path}/src
