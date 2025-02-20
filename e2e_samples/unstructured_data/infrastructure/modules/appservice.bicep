@@ -7,13 +7,9 @@
 ])
 param env string
 @description('The location of the resource.')
-param location string = resourceGroup().location
+param location string
 @description('The name of the web app.')
-param webAppName string = 'excitation'
-
-// @description('The URL of the repository.')
-// param repoUrl string = 'https://github.com/billba/excitation/tree/main/client'
-
+param webAppName string
 @description('The name of the hosting plan.')
 param hostingPlanName string
 @description('The SKU of the hosting plan.')
@@ -62,19 +58,6 @@ resource webApp 'Microsoft.Web/sites@2024-04-01' = {
     httpsOnly: true
   }
 }
-
-// source control configuration
-// resource sourceControl 'Microsoft.Web/sites/sourcecontrols@2024-04-01' = {
-//   parent: webApp
-//   name: 'web'
-//   properties: {
-//     repoUrl: repoUrl
-//     branch: 'main'
-//     isManualIntegration: true
-//     deploymentRollbackEnabled: true
-//     isMercurial: false
-//   }
-// }
 
 output web_app_Url string = webApp.properties.defaultHostName
 output appservice_plan_name string = appServicePlan.name

@@ -5,24 +5,19 @@
   'prod'
 ])
 param env string
-
 @description('The location of the resource.')
-param location string = resourceGroup().location
-
+param location string
 @description('The name of the FunctionApp.')
 param functionAppName string
-
 @description('The name of Team for tagging purposes.')
 param TeamName string
-
-// param ftpsState string = 'FtpsOnly'
+@description('The name of the storage account.')
 param storageAccountName string
-
-// @description('The URL of the repository.')
-// param repoUrl string = 'https://github.com/billba/excitation/tree/main/reference-azure-backend/functions'
-
+@description('The version of the node runtime.')
 param linuxFxVersion string = 'node|22-lts'
+@description('The name given to the hosting plan.')
 param hostingPlanName string
+@description('The site config always on setting.')
 param alwaysOn bool = false
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
@@ -81,7 +76,6 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         ]
       }
       nodeVersion: '22.14.0'
-      // ftpsState: ftpsState
       linuxFxVersion: linuxFxVersion
     }
     clientAffinityEnabled: false
@@ -90,27 +84,6 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     httpsOnly: true
   }
 }
-
-// source control configuration
-// resource sourceControl 'Microsoft.Web/sites/sourcecontrols@2024-04-01' = {
-//   parent: functionApp
-//   name: 'web'
-//   properties: {
-//     repoUrl: repoUrl
-//     branch: 'main'
-//     isManualIntegration: true
-//     deploymentRollbackEnabled: true
-//     isMercurial: false
-//   }
-// }
-
-// resource scmPolicy 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2024-04-01' = {
-//   parent: functionApp
-//   name: 'scm'
-//   properties: {
-//     allow: false
-//   }
-// }
 
 resource ftpPolicy 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2024-04-01' = {
   parent: functionApp
