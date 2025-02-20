@@ -18,6 +18,9 @@ param TeamName string
 // param ftpsState string = 'FtpsOnly'
 param storageAccountName string
 
+// @description('The URL of the repository.')
+// param repoUrl string = 'https://github.com/billba/excitation/tree/main/reference-azure-backend/functions'
+
 param linuxFxVersion string = 'node|22-lts'
 param hostingPlanName string
 param alwaysOn bool = false
@@ -88,13 +91,26 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   }
 }
 
-resource scmPolicy 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2024-04-01' = {
-  parent: functionApp
-  name: 'scm'
-  properties: {
-    allow: false
-  }
-}
+// source control configuration
+// resource sourceControl 'Microsoft.Web/sites/sourcecontrols@2024-04-01' = {
+//   parent: functionApp
+//   name: 'web'
+//   properties: {
+//     repoUrl: repoUrl
+//     branch: 'main'
+//     isManualIntegration: true
+//     deploymentRollbackEnabled: true
+//     isMercurial: false
+//   }
+// }
+
+// resource scmPolicy 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2024-04-01' = {
+//   parent: functionApp
+//   name: 'scm'
+//   properties: {
+//     allow: false
+//   }
+// }
 
 resource ftpPolicy 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2024-04-01' = {
   parent: functionApp
@@ -103,3 +119,5 @@ resource ftpPolicy 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2024-
     allow: false
   }
 }
+
+output functionapp_name string = functionApp.name
