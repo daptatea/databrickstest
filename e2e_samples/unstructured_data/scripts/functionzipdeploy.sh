@@ -8,7 +8,6 @@ RESOURCE_GROUP=$2
 FUNCTION_APP=$3
 STORAGE_ACCOUNT=$4
 CONTAINER_NAME=$FUNCTION_APP
-EXPIRATION_DATE=$(date -u -d "30 day" '+%Y-%m-%dT%H:%MZ')
 
 # Generate a file name based on the current date-time epoch
 EPOCH_TIME=$(date +%s)
@@ -37,13 +36,10 @@ az storage blob upload \
     --file ./deploy.zip \
     --overwrite
 
-# Generate SAS token - Update expiry date here
-SAS_TOKEN=$(az storage blob generate-sas --account-name $STORAGE_ACCOUNT --container-name $CONTAINER_NAME --name $BLOB_NAME --permissions r --expiry $EXPIRATION_DATE --output tsv)
-
 # Construct the SAS URL
-BLOB_URL="https://${STORAGE_ACCOUNT}.blob.core.windows.net/${CONTAINER_NAME}/${BLOB_NAME}?${SAS_TOKEN}"
+BLOB_URL="https://${STORAGE_ACCOUNT}.blob.core.windows.net/${CONTAINER_NAME}/${BLOB_NAME}"
 
-echo "SAS URL: $BLOB_URL"
+echo "BLOB URL: $BLOB_URL"
 
 # Set the WEBSITE_RUN_FROM_PACKAGE app setting to the deployment package SAS URL
 az functionapp config appsettings set -g $RESOURCE_GROUP -n $FUNCTION_APP --settings WEBSITE_RUN_FROM_PACKAGE=$BLOB_URL
