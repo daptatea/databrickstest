@@ -65,6 +65,31 @@ module sql './modules/sql.bicep' = {
   }
 }
 
+module appservice './modules/appservice.bicep' = {
+  name: 'appservice_deploy_${deployment_id}'
+  params: {
+    env: env
+    webAppName: 'excitation-testing'
+    hostingPlanName: 'excitation-testing'
+    location: location
+    sku: 'S1'
+    tier: 'Standard'
+    TeamName: team_name
+  }
+}
+
+module functionapp './modules/functionapp.bicep' = {
+  name: 'functionapp_deploy_${deployment_id}'
+  params: {
+    env: env
+    functionAppName: 'excitationfuncapp'
+    hostingPlanName: appservice.outputs.appservice_plan_name
+    storageAccountName: storage.outputs.storage_account_name
+    location: location
+    TeamName: team_name
+  }
+}
+
 // module appinsights './modules/appinsights.bicep' = {
 //   name: 'appinsights_deploy_${deployment_id}'
 //   params: {
@@ -85,7 +110,6 @@ module sql './modules/sql.bicep' = {
 //   }
 // }
 
-
 // module diagnostic './modules/diagnostic_settings.bicep' = if (enable_monitoring) {
 //   name: 'diagnostic_settings_deploy_${deployment_id}'
 //   params: {
@@ -96,7 +120,6 @@ module sql './modules/sql.bicep' = {
 //     datafactory_name: datafactory.outputs.datafactory_name
 //   }
 // }
-
 
 // module dashboard './modules/dashboard.bicep' = if (enable_monitoring) {
 //   name: 'dashboard_${deployment_id}'
@@ -147,8 +170,6 @@ module sql './modules/sql.bicep' = {
 //   ]
 // }
 
-
-
 output storage_account_name string = storage.outputs.storage_account_name
 output databricks_output object = databricks.outputs.databricks_output
 output databricks_id string = databricks.outputs.databricks_id
@@ -160,3 +181,5 @@ output sql_server_name string = sql.outputs.sql_server_name
 output sql_server_resource_id string = sql.outputs.sql_server_resource_id
 output sql_db_name string = sql.outputs.sql_db_name
 output sql_db_resource_id string = sql.outputs.sql_db_resource_id
+output appservice_name string = appservice.outputs.appservice_plan_name
+output functionapp_name string = functionapp.outputs.functionapp_name
