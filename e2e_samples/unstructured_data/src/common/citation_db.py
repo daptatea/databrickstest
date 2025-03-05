@@ -1,7 +1,7 @@
-import logging
 import random
 import string
 import struct
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
 
@@ -10,10 +10,34 @@ import yaml
 from azure.identity import DefaultAzureCredential
 from common.analyze_submissions import AnalyzedDocument
 from common.citation import ValidCitation
+from common.config_utils import Fetcher
+from common.logging import get_logger
 from common.path_utils import RepoPaths
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger = get_logger(__name__)
+
+
+@dataclass
+class CitationDBConfig:
+    question_id: int
+    form_suffix: str
+    conn_str: str
+    creator: str
+
+    @classmethod
+    def fetch(
+        cls, fetcher: Fetcher, creator: str, question_id: Optional[int] = None, run_id: Optional[str] = None
+    ) -> Optional["CitationDBConfig"]:
+        is_enabled = fetcher.get_bool("CITATION_DB_ENABLED", False)
+        if not is_enabled:
+            return None
+
+        if question_id is None:
+            raise KeyError("'question_id' is a required argument when Citation DB is enabled.")
+
+        conn_str = fetcher.get_strict("CITATION_DB_CONNECTION_STRING")
+        form_suffix = f"_{run_id}" if run_id else ""
+        return cls(conn_str=conn_str, question_id=question_id, creator=creator, form_suffix=form_suffix)
 
 
 def get_conn(conn_str: str) -> pyodbc.Connection:
