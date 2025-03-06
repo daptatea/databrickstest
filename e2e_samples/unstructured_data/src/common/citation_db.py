@@ -7,21 +7,24 @@ from typing import Any, Optional
 
 import pyodbc
 import yaml
-from azure.identity import DefaultAzureCredential
+
 from common.analyze_submissions import AnalyzedDocument
 from common.citation import ValidCitation
 from common.path_utils import RepoPaths
+
+# from azure.identity import DefaultAzureCredential
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
 def get_conn(conn_str: str) -> pyodbc.Connection:
-    credential = DefaultAzureCredential()
-    token_bytes = credential.get_token("https://database.windows.net/.default").token.encode("UTF-16-LE")
-    token_struct = struct.pack(f"<I{len(token_bytes)}s", len(token_bytes), token_bytes)
-    SQL_COPT_SS_ACCESS_TOKEN = 1256  # This connection option is defined by microsoft in msodbcsql.h
-    return pyodbc.connect(conn_str, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct})
+    # credential = DefaultAzureCredential()
+    # token_bytes = credential.get_token("https://database.windows.net/.default").token.encode("UTF-16-LE")
+    # token_struct = struct.pack(f"<I{len(token_bytes)}s", len(token_bytes), token_bytes)
+    # SQL_COPT_SS_ACCESS_TOKEN = 1256  # This connection option is defined by microsoft in msodbcsql.h
+    return pyodbc.connect(conn_str)  # , attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct})
 
 
 def commit_forms_docs_citations_to_db(
@@ -215,7 +218,7 @@ def create_template(
     VALUES (?, ?);
     """
     cursor.execute(query, (template_name, creator))
-    template_id = cursor.fetchval()
+    template_id = 1  # cursor.fetchval()
     conn.commit()
     return template_id
 
